@@ -1,7 +1,13 @@
 import streamlit as st
 import pandas as pd
 import os
+import matplotlib.pyplot as plt
+import streamlit_authenticator as stauth
+import yaml
+from yaml.loader import SafeLoader
 
+
+#criar login 
 #BASE_DIR = r"C:\Users\Ferreira\OneDrive\CIG-CONTROLADORIA\3_third_task_abcdx_com_estoque"
 BASE_DIR = "data"
 st.set_page_config(
@@ -9,13 +15,88 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("📊 Dashboard Executivo — ABCDX, Estoque e Ruptura - Período de 90 dias")
-# 🔽 Seleção da loja
-lojas = sorted([d for d in os.listdir(BASE_DIR) if d.isdigit()])
-loja = st.selectbox("Selecione a loja", lojas)
+
+credentials = {
+    "usernames":{
+        "gestor um": {
+            "name": "Gestor Loja 1",
+            "password": '$2b$12$jgw50OJxyvrl.bTWXJHxKOVuyUMZCK6ibrcDXrYE3eLXgmpXEx6O2', #gestor@123
+            "role": "gestor",
+            "lojas": ["1"]
+        },
+        "diretoria": {
+            "name": "Diretor Geral",
+            "password": "$2b$12$wcWIGSeo8Bsrc8q4dF9fCODJncEhEYuD84MToAbXM9a1sEkVNMxnK", #diretor@123
+            "role": "diretor",
+            "lojas": []
+        }
+    }
+}
+
+# ===============================
+# ===============================
+# LOGIN
+# ===============================
+authenticator = stauth.Authenticate(
+    credentials,
+    "abcdx_dashboard",
+    "abcdef123456",
+    cookie_expiry_days=7
+)
+
+authenticator.login(location="sidebar")
+
+authentication_status = st.session_state.get("authentication_status")
+username = st.session_state.get("username")
+name = st.session_state.get("name")
+
+#deveser sidebar, ou main
+if authentication_status is False:
+    st.error("Usuário ou senha incorretos")
+    st.stop()
+
+if authentication_status is None:
+    st.warning("Digite seu usuário e senha")
+    st.stop()
+
+authenticator.logout("logout", "sidebar")
+
+perfil = credentials["usernames"][username]
+
+# ===============================
+# CONTROLE DE LOJA
+# ===============================
+if perfil["role"] == "gestor":
+    loja_selecionada = perfil["lojas"][0]
+    st.info(f"👤 Usuário: {perfil['name']} | Loja {loja_selecionada}")
+
+elif perfil["role"] == "diretor":
+    lojas_disponiveis = sorted(
+        [d for d in os.listdir(BASE_DIR) if d.isdigit()]
+    )
+
+    loja_selecionada = st.selectbox(
+        "Selecione a loja",
+        lojas_disponiveis
+    )
+
+    st.info(f"👤 Usuário: {perfil['name']} | Acesso total")
+
+else:
+    st.error("Perfil de usuário inválido")
+    st.stop()
+
+# ===============================
+# TÍTULO
+# ===============================
+st.title("📊 Dashboard Executivo — ABCDX, Estoque e Ruptura")
+st.caption("Período de análise: 90 dias")
+
+# ===============================
+
 
 # 🔽 Arquivo mais recente da loja
-pasta_loja = os.path.join(BASE_DIR, loja)
+pasta_loja = os.path.join(BASE_DIR, loja_selecionada)
 arquivos = sorted(
     [f for f in os.listdir(pasta_loja) if f.endswith(".parquet")],
     reverse=True

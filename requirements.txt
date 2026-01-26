@@ -3,3 +3,4 @@ pandas
 pyarrow
 matplotlib
 numpy
+streamlit-authenticator
