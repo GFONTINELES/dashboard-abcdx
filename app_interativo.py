@@ -2,26 +2,6 @@ import streamlit as st
 import pandas as pd
 import os
 
-USUARIOS = {
-    "diretoria": "abcdx2026",
-    "financeiro": "estoque@2026"
-}
-
-def login():
-    st.title("🔐 Acesso restrito")
-    usuario = st.text_input("Usuário")
-    senha = st.text_input("Senha", type="password")
-
-    if st.button("Entrar"):
-        if USUARIOS.get(usuario) == senha:
-            st.session_state["logado"] = True
-        else:
-            st.error("Usuário ou senha inválidos")
-
-if "logado" not in st.session_state:
-    login()
-    st.stop()
-
 #BASE_DIR = r"C:\Users\Ferreira\OneDrive\CIG-CONTROLADORIA\3_third_task_abcdx_com_estoque"
 BASE_DIR = "data"
 st.set_page_config(
