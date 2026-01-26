@@ -1,0 +1,177 @@
+import streamlit as st
+import pandas as pd
+import os
+
+USUARIOS = {
+    "diretoria": "abcdx2026",
+    "financeiro": "estoque@2026"
+}
+
+def login():
+    st.title("🔐 Acesso restrito")
+    usuario = st.text_input("Usuário")
+    senha = st.text_input("Senha", type="password")
+
+    if st.button("Entrar"):
+        if USUARIOS.get(usuario) == senha:
+            st.session_state["logado"] = True
+        else:
+            st.error("Usuário ou senha inválidos")
+
+if "logado" not in st.session_state:
+    login()
+    st.stop()
+
+#BASE_DIR = r"C:\Users\Ferreira\OneDrive\CIG-CONTROLADORIA\3_third_task_abcdx_com_estoque"
+BASE_DIR = "data"
+st.set_page_config(
+    page_title="Dashboard ABCDX & Ruptura",
+    layout="wide"
+)
+
+st.title("📊 Dashboard Executivo — ABCDX, Estoque e Ruptura - Período de 90 dias")
+# 🔽 Seleção da loja
+lojas = sorted([d for d in os.listdir(BASE_DIR) if d.isdigit()])
+loja = st.selectbox("Selecione a loja", lojas)
+
+# 🔽 Arquivo mais recente da loja
+pasta_loja = os.path.join(BASE_DIR, loja)
+arquivos = sorted(
+    [f for f in os.listdir(pasta_loja) if f.endswith(".parquet")],
+    reverse=True
+)
+
+arquivos = [
+    os.path.join(pasta_loja, f)
+    for f in os.listdir(pasta_loja)
+    if f.endswith(".parquet")
+]
+
+arquivo = max(arquivos, key=os.path.getmtime)
+df = pd.read_parquet(arquivo)
+df['CMV_POR_DIA_NUM'] = (
+    df['CMV_POR_DIA']
+    .str.replace('R$', '', regex=False)
+    .str.replace('.', '', regex=False)
+    .str.replace(',', '.', regex=False)
+    .astype(float)
+)
+
+valor_ruptura = (
+        df.loc[df['RUPTURA'] == 1, 'CMV_POR_DIA_NUM']
+        .sum()
+    )
+# 🔝 KPIs
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("🔴 Produtos em ruptura", int(df['RUPTURA'].sum()))
+col2.metric(
+        "💸 Perda diária estimada",
+        f"R$ {valor_ruptura:,.2f}"
+            .replace(",", "X")
+            .replace(".", ",")
+            .replace("X", "."),
+        help="Valor estimado de perda diária considerando produtos em ruptura"
+    )
+col3.metric("📦 DDE médio atual", round(df['DDE_ATUAL'].mean(), 1))
+col4.metric(
+    "🎯 % fora do DDE ideal",
+    round((df['DDE_ATUAL'] < df['DDE_IDEAL']).mean() * 100, 1)
+)
+st.divider()
+
+with st.expander("📊 Ver gráficos detalhados"):
+    import matplotlib.pyplot as plt
+
+    st.subheader("🔴 Distribuição da Ruptura por ABCDX ((Empresa))")
+
+    ruptura_abc = (
+        df[df['RUPTURA'] == 1]
+        .groupby('ABCX_EMPRESA')
+        .size()
+    )
+
+    if not ruptura_abc.empty:
+        total = ruptura_abc.sum()
+
+        labels = [
+            f"{classe} — {valor / total:.1%}"
+            for classe, valor in ruptura_abc.items()
+        ]
+
+        fig, ax = plt.subplots()
+        wedges, _ = ax.pie(
+            ruptura_abc,
+            startangle=90
+        )
+
+        ax.axis('equal')
+
+        ax.legend(
+            wedges,
+            labels,
+            title="Classe ABCDX",
+            loc="center left",
+            bbox_to_anchor=(1, 0.5)
+        )
+
+        st.pyplot(fig)
+    else:
+        st.info("Nenhum produto em ruptura para os filtros selecionados.")
+
+
+    st.subheader("🎯 Produtos dentro x fora do DDE ideal")
+
+    dde_status = pd.Series({
+        "Dentro do DDE ideal": (df['DDE_ATUAL'] >= df['DDE_IDEAL']).sum(),
+        "Fora do DDE ideal": (df['DDE_ATUAL'] < df['DDE_IDEAL']).sum()
+    })
+
+    fig, ax = plt.subplots()
+    ax.bar(dde_status.index, dde_status.values)
+
+    ax.set_ylabel("Quantidade de produtos")
+    ax.set_xlabel("")
+    ax.set_title("Situação de cobertura de estoque")
+
+    for i, v in enumerate(dde_status.values):
+        ax.text(i, v, f"{v:,}", ha='center', va='bottom')
+
+    st.pyplot(fig)
+
+st.divider() #divisória visual
+
+col_f1, col_f2, col_f3 = st.columns(3)
+
+with col_f1:
+    divisao = st.multiselect(
+        "Divisão",
+        options=sorted(df['iddivisao'].unique())
+    )
+
+with col_f2:
+    abcx_empresa = st.multiselect(
+        "ABCDX (Empresa)",
+        options=sorted(df['ABCX_EMPRESA'].dropna().unique())
+    )
+
+with col_f3:
+    abcx_subgrupo = st.multiselect(
+        "ABCDX (Subgrupo)",
+        options=sorted(df['ABCX_SUBGRUPO'].dropna().unique())
+    )
+
+# Aplicação dos filtros
+if divisao:
+    df = df[df['iddivisao'].isin(divisao)]
+
+if abcx_empresa:
+    df = df[df['ABCX_EMPRESA'].isin(abcx_empresa)]
+
+if abcx_subgrupo:
+    df = df[df['ABCX_SUBGRUPO'].isin(abcx_subgrupo)]
+
+#  Tabela final
+st.dataframe(
+    df.sort_values('RUPTURA_VALOR', ascending=False),
+    use_container_width=True
+)
