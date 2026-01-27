@@ -18,11 +18,149 @@ st.set_page_config(
 
 credentials = {
     "usernames":{
-        "gestor um": {
+        "gestao_um": {
             "name": "Gestor Loja 1",
             "password": '$2b$12$jgw50OJxyvrl.bTWXJHxKOVuyUMZCK6ibrcDXrYE3eLXgmpXEx6O2', #gestor@123
             "role": "gestor",
             "lojas": ["1"]
+        },
+        "gestor_dois": {
+            "name": "Gestor Loja 2",
+            "password": '$2b$12$4FYJS/afhW7FMM7601YGie1tQqKapnhDhKsiq3wrih3dqXM7e1br2', #lojad0isgvr
+            "role": "gestor",
+            "lojas": ["2"]
+        },
+        "gestor_tres": {
+            "name": "Gestor Loja 3",
+            "password": '$2b$12$71FH61QS8gLxu/oJoQjSh.zmUzA.8MwddcpBGskd1HBcNGLocxdoy', #GestaoljaFR3
+            "role": "gestor",
+            "lojas": ["3"]
+        },
+        "gestor_quatro": {
+            "name": "Gestor Loja 4",
+            "password": '$2b$12$.zXygYbZXA1skXcLGaVa9eGTvR1C2VHmgPMrWuO53Z66nsB6Z4x7W', #quatr0loj2
+            "role": "gestor",
+            "lojas": ["4"]
+        },
+        "gestor_cinco": {
+            "name": "Gestor Loja 5",
+            "password": '$2b$12$hejES75TMEIgJBxron05iewrTH8Un6TOC2UhRdAgQEn9VwSLGVR.a', #Loj2@c1nc0
+            "role": "gestor",
+            "lojas": ["5"]
+        },
+        "gestor_seis": {
+            "name": "Gestor Loja 6",
+            "password": '$2b$12$FmLkidPX8qd7JyxPbRaoMuO8xLcw3OkzFqVMxU8pDbOk5kpKMLey2', #lo6ja@66Ferr
+            "role": "gestor",
+            "lojas": ["6"]
+        },
+        "gestor_sete": {
+            "name": "Gestor Loja 7",
+            "password": '$2b$12$Ybg2vQnvn3E.SlLAOgfSeuEhv24kgOYi1QiX.J14hevIgGQcgEP5G', #loj@set3@7
+            "role": "gestor",
+            "lojas": ["7"]
+        },
+        "gestor_oito": {
+            "name": "Gestor Loja 8",
+            "password": '$2b$12$zQrAbzJcg82x6PdnL6vZ.O8TjHuDYB32ex6nUNy6zy6yB6Dhuu2S.', #@gerencia_8@8
+            "role": "gestor",
+            "lojas": ["8"]
+        },
+        "gestor_nove": {
+            "name": "Gestor Loja 9",
+            "password": '$2b$12$w4lcPbVSTVKR.y.3hb5cn.K9yUxsptCDqVj9jSKwIDNICleQuMZXa', #NovE@ferR
+            "role": "gestor",
+            "lojas": ["9"]
+        },
+        "gestor_dez": {
+            "name": "Gestor Loja 10",
+            "password": '$2b$12$6Ymh4bSooQahWd0iPTdLVOYqPaHJfeWdqmGK/o80RToZILI/iXuCG', #ger@dEz@10
+            "role": "gestor",
+            "lojas": ["10"]
+        },
+        "gestor_11": {
+            "name": "Gestor Loja 11",
+            "password": '$2b$12$my8cW50.oQrXe4vL9DTUtO8S7GbJRBzKV37LOyymgBtjKvtismX92', #gestao_11@G
+            "role": "gestor",
+            "lojas": ["11"]
+        },
+        "gestor_doze": {
+            "name": "Gestor Loja 12",
+            "password": '$2b$12$R9S8Ot/Qy1oBS0/rYYEs2.P3afEWzhkCHO0lZCK6PE29GjD6dqkYm', #12gestao_d0ZE
+            "role": "gestor",
+            "lojas": ["12"]
+        },
+        "gestor_treze": {
+            "name": "Gestor Loja 13",
+            "password": '$2b$12$u2KiS.Fmd8g6Mp0kRJ.XFefX.xxw/tIT83WbONjgifHUcmkb8M8Fe', #treze_@gEs
+            "role": "gestor",
+            "lojas": ["13"]
+        },
+        "gestor_catorze": {
+            "name": "Gestor Loja 14",
+            "password": '$2b$12$STA8WaoJ1f4kHOwhd8/JoOJwRskVUH4m1ltCaU5i3GvyB3Nra8jM6', #loja14@QtZ
+            "role": "gestor",
+            "lojas": ["14"]
+        },
+        "gestor_quinze": {
+            "name": "Gestor Loja 15",
+            "password": '$2b$12$M.IIhRxTYjEwm88CdBVhkeXjG7tg/AfZCW9YAbo0ETLoGVQl617ai', #qUiNz@@15
+            "role": "gestor",
+            "lojas": ["15"]
+        },
+        "gestor_dezesseis": {
+            "name": "Gestor Loja 16",
+            "password": '$2b$12$cLLjOIhkHdg62hoYHBLqS.y/zG8LekTwsdNEZzBuecXiXlBRKKcXu', #ges_16@gE
+            "role": "gestor",
+            "lojas": ["16"]
+        },
+        "gestor_dezessete": {
+            "name": "Gestor Loja 17",
+            "password": '$2b$12$P8/EotWTCKNTJ.s2RPpy7OdwIPpyYJdsMHnqiaQFW9KdXTh9nEDfW', #17@@LOj_1
+            "role": "gestor",
+            "lojas": ["17"]
+        },
+        "gestor_18": {
+            "name": "Gestor Loja 18",
+            "password": '$2b$12$w6uEpYiy3i5Kryr/viFUneMy2gV4G04wpmUVRXzRCgyvC7I0BvFhi', #p8fer_@188
+            "role": "gestor",
+            "lojas": ["18"]
+        },
+        "gestor_21": {
+            "name": "Gestor Loja 21",
+            "password": '$2b$12$YxWqJU1cMlQintlFphZA.OViJaAg4Rs0zMNkpKrEC56gyKigVvwS6', #GestAO21@2026
+            "role": "gestor",
+            "lojas": ["21"]
+        },
+        "gestor_22": {
+            "name": "Gestor Loja 22",
+            "password": '$2b$12$N88iRri8LRjb8FoN7eLyTOwCInIAow8QWyc8hsyEMUrXf.cahtBra', #LJ22@feRR
+            "role": "gestor",
+            "lojas": ["22"]
+        },
+        "gestor_23": {
+            "name": "Gestor Loja 23",
+            "password": '$2b$12$39x8ajUR1X/jAwgtNcU34.78Hdqn1sqObkeZTeyxpsXklaRWKZ9cW', #Ferr@F23@
+            "role": "gestor",
+            "lojas": ["23"]
+        },
+        "gestor_24": {
+            "name": "Gestor Loja 24",
+            "password": '$2b$12$TIYx/DLCXI6Fq.ZUo8mebeJnQua7hOrnbDR3BosZhwKKwSwznH4Km', #24@FeRReira42
+            "role": "gestor",
+            "lojas": ["24"]
+        },
+        "gestor_25": {
+            "name": "Gestor Loja 25",
+            "password": '$2b$12$E10bekqh2Ehgc8XxJ7FDZO0NomoX0JLVWgDLfl3kCZopHQTefTIQi', #L25_lj@feR
+            "role": "gestor",
+            "lojas": ["25"]
+        },
+        "gestor_101": {
+            "name": "Gestor Loja 101",
+            "password": '$2b$12$8VYAjm2fgiQ9BTIibpuTUecFn3wV1PsQ39GFdcUjZ66Dol8NXQLda', #Loja@101FRR
+            "role": "gestor",
+            "lojas": ["101"]
         },
         "diretoria": {
             "name": "Diretor Geral",
