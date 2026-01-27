@@ -399,6 +399,22 @@ for loja in lojas:
     query_custo_medio = SQL_CUSTO_MEDIO.format(loja=loja)
     df_custo_medio = pd.read_sql(query_custo_medio, engine)
 
+    df_custo_medio = (
+    df_custo_medio
+    .groupby(['idempresa', 'idproduto', 'idsubproduto'], as_index=False)
+    .agg({
+        'valcustomedio': 'max'   # ou 'mean' se preferir
+    })
+)
+
+    df_estoque = (
+        df_estoque
+        .groupby(['idempresa', 'idproduto', 'idsubproduto'], as_index=False)
+        .agg({
+            'qtd_estoque_atual': 'sum'
+        })
+    )
+
 
     try:
         df = pd.read_sql(query, engine)
@@ -409,14 +425,14 @@ for loja in lojas:
                     'idempresa',
                     'idproduto',
                     'idsubproduto',
-                    'descrresproduto',
-                    'iddivisao',
-                    'idsubgrupo',
-                    'fornecedor',
                 ],
                 as_index=False
             )
             .agg({
+                'descrresproduto': 'first',
+                'iddivisao': 'first',
+                'idsubgrupo': 'first',
+                'fornecedor': 'first',
                 'qtdproduto': 'sum',
                 'valtotliquido': 'sum',
                 'vallucro_linha': 'sum',
@@ -424,7 +440,6 @@ for loja in lojas:
                 'descroperacao': 'first'
             })
         )
-
 
         if df.empty:
             print(f"⚠️ Loja {loja}: nenhum dado retornado.")
@@ -462,6 +477,17 @@ for loja in lojas:
             'ABCX': 'ABCX_SUBGRUPO',
             'pct_contribution': 'PCT_CONTRIB_SUBGRUPO',
         })
+
+        def checa_granularidade(df, nome):
+            dup = df.duplicated(
+                subset=['idempresa', 'idproduto', 'idsubproduto'],
+                keep=False
+            ).sum()
+            print(f"🔎 {nome}: duplicados = {dup}")
+
+        checa_granularidade(df, "DF PRINCIPAL")
+        checa_granularidade(df_estoque, "DF ESTOQUE")
+        checa_granularidade(df_custo_medio, "DF CUSTO MÉDIO")
 
         df_final = (
             df

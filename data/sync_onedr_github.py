@@ -7,7 +7,7 @@ from datetime import datetime
 ORIGEM = r"C:\Users\Ferreira\OneDrive\CIG-CONTROLADORIA\3_third_task_abcdx_com_estoque"
 
 # 🔹 DESTINO (repositório GitHub local)
-DESTINO = r"C:\Users\Ferreira\Documents\dashboard-abcdx\data"
+DESTINO = r"C:\Users\Ferreira\dashboard-abcdx\data"
 
 # Limpa destino
 for root, dirs, files in os.walk(DESTINO):

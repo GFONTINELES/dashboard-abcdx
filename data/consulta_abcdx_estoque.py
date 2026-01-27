@@ -42,10 +42,11 @@ lojas = df_lojas["idempresa"].tolist()
 print(f"🏬 Lojas encontradas: {lojas}")
 
 def abc_by_group_excel_style(df, group_cols, item_col, value_col):
+    item_cols = item_col if isinstance(item_col, list) else [item_col]
+
     grouped = (
-        df.groupby(group_cols + [item_col])[value_col]
+        df.groupby(group_cols + item_cols, as_index=False)[value_col]
           .sum()
-          .reset_index()
     )
 
     def classify_excel_style(group):
@@ -55,39 +56,36 @@ def abc_by_group_excel_style(df, group_cols, item_col, value_col):
         group['pct_contribution'] = group[value_col] / total
         group['cum_pct'] = group['pct_contribution'].cumsum() * 100
 
-        abcx_labels = []
-
-        for idx, row in group.iterrows():
-            if row[value_col] == 0:
-                abcx_labels.append('X')
-                continue
-
-            if idx == group.index[0]:
-                abcx_labels.append('A')
-                continue
-
-            pct = row['cum_pct']
-
+        def regra(pct, valor, idx):
+            if valor == 0:
+                return 'X'
+            if idx == 0:
+                return 'A'
             if pct < 30:
-                abcx_labels.append('A')
+                return 'A'
             elif pct < 60:
-                abcx_labels.append('B')
+                return 'B'
             elif pct < 80:
-                abcx_labels.append('C')
+                return 'C'
             elif pct < 99.75:
-                abcx_labels.append('D')
+                return 'D'
             else:
-                abcx_labels.append('X')
+                return 'X'
 
-        group['ABCX'] = abcx_labels
+        group['ABCX'] = [
+            regra(row['cum_pct'], row[value_col], i)
+            for i, (_, row) in enumerate(group.iterrows())
+        ]
+
         return group
 
     return (
         grouped
         .groupby(group_cols, group_keys=False)
-        .apply(classify_excel_style)
+        .apply(classify_excel_style)   # 🔥 REMOVIDO include_groups=False
         .reset_index(drop=True)
     )
+
 def format_money_br(valor):
     return (
         valor
@@ -399,31 +397,57 @@ for loja in lojas:
     query_custo_medio = SQL_CUSTO_MEDIO.format(loja=loja)
     df_custo_medio = pd.read_sql(query_custo_medio, engine)
 
+    df_custo_medio = (
+    df_custo_medio
+    .groupby(['idempresa', 'idproduto', 'idsubproduto'], as_index=False)
+    .agg({
+        'valcustomedio': 'max'   # ou 'mean' se preferir
+    })
+)
+
+    df_estoque = (
+        df_estoque
+        .groupby(['idempresa', 'idproduto', 'idsubproduto'], as_index=False)
+        .agg({
+            'qtd_estoque_atual': 'sum'
+        })
+    )
 
     try:
         df = pd.read_sql(query, engine)
+        # 🔑 CHAVE ÚNICA DO PRODUTO
+        CHAVE_PRODUTO = [
+            'idempresa',
+            'idproduto',
+            'idsubproduto'
+        ]
+
         df = (
             df
-            .groupby(
-                [
-                    'idempresa',
-                    'idproduto',
-                    'idsubproduto',
-                    'descrresproduto',
-                    'iddivisao',
-                    'idsubgrupo',
-                    'fornecedor',
-                ],
-                as_index=False
-            )
+            .groupby(CHAVE_PRODUTO, as_index=False)
             .agg({
+                # 🔢 métricas → somadas
                 'qtdproduto': 'sum',
                 'valtotliquido': 'sum',
                 'vallucro_linha': 'sum',
+
+                # 🧱 dimensões → mantém apenas um valor
+                'descrresproduto': 'first',
+                'iddivisao': 'first',
+                'idsubgrupo': 'first',
+                'fornecedor': 'first',
                 'descrlocal': 'first',
                 'descroperacao': 'first'
             })
         )
+
+        # 🔎 VALIDAÇÃO: não pode existir produto duplicado
+        duplicados = df.duplicated(
+            subset=['idempresa', 'idproduto', 'idsubproduto'],
+            keep=False
+        )
+
+        print(f"🔎 Duplicados após groupby: {duplicados.sum()}")
 
 
         if df.empty:
@@ -435,11 +459,12 @@ for loja in lojas:
         abc_empresa = abc_by_group_excel_style(
             df=df,
             group_cols=['idempresa'],
-            item_col='descrresproduto', 
+            item_col=['idproduto', 'idsubproduto'],
             value_col='valtotliquido'
         )[[
             'idempresa',
-            'descrresproduto',
+            'idproduto',
+            'idsubproduto',
             'pct_contribution',
             'ABCX'
         ]].rename(columns={
@@ -447,33 +472,47 @@ for loja in lojas:
             'pct_contribution': 'PCT_CONTRIB_EMPRESA'
         })
 
+
         abc_subgrupo = abc_by_group_excel_style(
             df=df,
             group_cols=['idempresa', 'idsubgrupo'],
-            item_col='descrresproduto',
+            item_col=['idproduto', 'idsubproduto'],
             value_col='valtotliquido'
         )[[
             'idempresa',
             'idsubgrupo',
-            'descrresproduto',
+            'idproduto',
+            'idsubproduto',
             'pct_contribution',
             'ABCX'
         ]].rename(columns={
             'ABCX': 'ABCX_SUBGRUPO',
-            'pct_contribution': 'PCT_CONTRIB_SUBGRUPO',
+            'pct_contribution': 'PCT_CONTRIB_SUBGRUPO'
         })
+
+
+        def checa_granularidade(df, nome):
+            dup = df.duplicated(
+                subset=['idempresa', 'idproduto', 'idsubproduto'],
+                keep=False
+            ).sum()
+            print(f"🔎 {nome}: duplicados = {dup}")
+
+        checa_granularidade(df, "DF PRINCIPAL")
+        checa_granularidade(df_estoque, "DF ESTOQUE")
+        checa_granularidade(df_custo_medio, "DF CUSTO MÉDIO")
 
         df_final = (
             df
             .merge(
                 abc_empresa,
-                on=['idempresa', 'descrresproduto'],
+                on=['idempresa', 'idproduto', 'idsubproduto'],
                 how='left'
             )
 
             .merge(
                 abc_subgrupo,
-                on=['idempresa', 'idsubgrupo', 'descrresproduto'],
+                on=['idempresa', 'idsubgrupo', 'idproduto', 'idsubproduto'],
                 how='left'
             )
         )
