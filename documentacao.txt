@@ -1,0 +1,4 @@
+streamlit run consulta_abcdx_estoque.py para todas as lojas
+copia e cola todas as alterações do OneDrive para a pasta local
+versionamento das mudanças para o git
+atualiza o site(deploy)
