@@ -16,7 +16,7 @@ st.set_page_config(
     layout="wide"
 )
 
-credentials = st.secrets["credentials"]
+credentials = copy.deepcopy(st.secrets["credentials"])
 
 # LOGIN
 # ===============================
