@@ -16,7 +16,12 @@ st.set_page_config(
     layout="wide"
 )
 
-credentials = copy.deepcopy(st.secrets["credentials"])
+credentials = {
+    "usernames": {
+        username: dict(user_data)
+        for username, user_data in st.secrets["credentials"]["usernames"].items()
+    }
+}
 
 # LOGIN
 # ===============================
