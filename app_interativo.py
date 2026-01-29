@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
+import copy
 
 
 #criar login 
