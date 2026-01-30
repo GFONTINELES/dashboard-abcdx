@@ -35,7 +35,7 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=7
 )
 
-logo = Image.open("assets/lOGO2.png")
+logo = Image.open("assets/LOGO2.png")
 
 st.sidebar.image(
     logo,
