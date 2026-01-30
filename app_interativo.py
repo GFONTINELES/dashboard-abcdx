@@ -42,7 +42,7 @@ st.sidebar.image(
     use_container_width=True
 )
 
-st.sidebar.markdown("<div style='height:7px'></div>", unsafe_allow_html=True)
+st.sidebar.markdown("<div style='height:35px'></div>", unsafe_allow_html=True)
 authenticator.login(location="sidebar")
 
 authentication_status = st.session_state.get("authentication_status")
