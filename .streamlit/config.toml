@@ -1,0 +1,17 @@
+[theme]
+base="light"
+
+# Verde Ferreira
+primaryColor="#00B050"
+
+# Fundo geral (amarelo bem claro)
+backgroundColor="#FFF9E6"
+
+# Sidebar
+secondaryBackgroundColor="#d8c622"
+
+# Texto
+textColor="#1A1A1A"
+
+# Fonte (opcional)
+font="sans serif"

@@ -6,8 +6,11 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 import copy
+from PIL import Image
 
-
+st.set_page_config(
+    page_icon="🔰"
+)
 #criar login 
 #BASE_DIR = r"C:\Users\Ferreira\OneDrive\CIG-CONTROLADORIA\3_third_task_abcdx_com_estoque"
 BASE_DIR = "data"
@@ -32,6 +35,14 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=7
 )
 
+logo = Image.open("assets/logo2.png")
+
+st.sidebar.image(
+    logo,
+    use_container_width=True
+)
+
+st.sidebar.markdown("<div style='height:7px'></div>", unsafe_allow_html=True)
 authenticator.login(location="sidebar")
 
 authentication_status = st.session_state.get("authentication_status")
@@ -55,6 +66,34 @@ if authentication_status is False:
 if authentication_status:
     st.session_state.login_attempts = 0
 
+if st.session_state.get("authentication_status") is None:
+    st.markdown(
+        """
+        <style>
+        .ferreira-box {
+            background-color: #0A7D32;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px; /* <-- ESPAÇO REAL */
+            text-align: center;
+        }
+
+        .ferreira-box h3 {
+            color: #FFD700;
+            margin: 0;
+            font-weight: 700;
+        }
+        </style>
+
+        <div class="ferreira-box">
+            <h3>Ferreira Supermercados</h3>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+st.sidebar.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+
 
 #deveser sidebar, ou main
 if authentication_status is False:
@@ -69,7 +108,7 @@ authenticator.logout("logout", "sidebar")
 
 perfil = credentials["usernames"][username]
 
-# ===============================
+
 # CONTROLE DE LOJA
 # ===============================
 if perfil["role"] == "gestor":
